@@ -74,7 +74,7 @@ void Z3Tests::test1()
     printExprValues();
     
     // Check if b > 0 is always true
-    addToSolver(b <= 0);
+    addToSolver(b > 0);
     std::cout << solver.check() << std::endl;
 }
 
