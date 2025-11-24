@@ -68,13 +68,13 @@ void Z3Tests::test1()
     expr a = getZ3Expr("a");
     expr b = getZ3Expr("b");
     
-    addToSolver(a == getCtx().int_val(0));
-    addToSolver(b == a + getCtx().int_val(1));
+    addToSolver(a == 0);
+    addToSolver(b == a + 1);
     
     printExprValues();
     
     // Check if b > 0 is always true
-    addToSolver(b <= getCtx().int_val(0));
+    addToSolver(b <= 0);
     std::cout << solver.check() << std::endl;
 }
 
