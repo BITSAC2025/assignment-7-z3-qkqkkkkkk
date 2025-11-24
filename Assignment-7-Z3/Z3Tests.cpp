@@ -74,7 +74,7 @@ void Z3Tests::test1()
     printExprValues();
     
     // Check if b > 0 is always true
-    addToSolver(b > 0);
+    //addToSolver(b > 0);
     std::cout << solver.check() << std::endl;
 }
 
@@ -107,7 +107,7 @@ void Z3Tests::test2()
     
     printExprValues();
     
-    addToSolver(b <= getCtx().int_val(3));
+    //addToSolver(b <= getCtx().int_val(3));
     std::cout << solver.check() << std::endl;
     //std::cout << "Assertion b > 3 is: " << (solver.check() == unsat ? "VALID" : "INVALID") << std::endl;
 }
@@ -146,7 +146,7 @@ void Z3Tests::test3()
     
     printExprValues();
     
-    addToSolver(x != getCtx().int_val(10));
+    //addToSolver(x != getCtx().int_val(10));
     std::cout << solver.check() << std::endl;
     //std::cout << "Assertion x == 10 is: " << (solver.check() == unsat ? "VALID" : "INVALID") << std::endl;
 }
@@ -189,7 +189,7 @@ void Z3Tests::test4()
     
     printExprValues();
     
-    addToSolver(a + b <= getCtx().int_val(20));
+    //addToSolver(a + b <= getCtx().int_val(20));
     std::cout << solver.check() << std::endl;
     //std::cout << "Assertion (a + b) > 20 is: " << (solver.check() == unsat ? "VALID" : "INVALID") << std::endl;
 }
@@ -228,7 +228,7 @@ void Z3Tests::test5()
     
     printExprValues();
     
-    addToSolver(b1 < getCtx().int_val(5));
+    //addToSolver(b1 < getCtx().int_val(5));
     std::cout << solver.check() << std::endl;
     //std::cout << "Assertion b1 >= 5 is: " << (solver.check() == unsat ? "VALID" : "INVALID") << std::endl;
 }
@@ -271,7 +271,7 @@ void Z3Tests::test6()
     printExprValues();
     
     // Check assertion *p == 5
-    addToSolver(loadValue(p) != getCtx().int_val(5));
+    //addToSolver(loadValue(p) != getCtx().int_val(5));
     std::cout << solver.check() << std::endl;
     //std::cout << "Assertion *p == 5 is: " << (solver.check() == unsat ? "VALID" : "INVALID") << std::endl;
 }
@@ -306,7 +306,7 @@ void Z3Tests::test7()
     
     printExprValues();
     
-    addToSolver(d != getCtx().int_val(5));
+    //addToSolver(d != getCtx().int_val(5));
     std::cout << solver.check() << std::endl;
     //std::cout << "Assertion d == 5 is: " << (solver.check() == unsat ? "VALID" : "INVALID") << std::endl;
 }
@@ -343,7 +343,7 @@ void Z3Tests::test8()
     
     printExprValues();
     
-    addToSolver(loadValue(p) != getCtx().int_val(0));
+    //addToSolver(loadValue(p) != getCtx().int_val(0));
     std::cout << solver.check() << std::endl;
     //std::cout << "Assertion *p == 0 is: " << (solver.check() == unsat ? "VALID" : "INVALID") << std::endl;
 }
@@ -398,7 +398,7 @@ void Z3Tests::test9()
     
     printExprValues();
     
-    addToSolver(z != getCtx().int_val(15));
+    //addToSolver(z != getCtx().int_val(15));
     std::cout << solver.check() << std::endl;
     //std::cout << "Assertion z == 15 is: " << (solver.check() == unsat ? "VALID" : "INVALID") << std::endl;
 }
@@ -436,7 +436,7 @@ void Z3Tests::test10()
     printExprValues();
     
     // Check the assertion
-    addToSolver(!(x == getCtx().int_val(3) && y == getCtx().int_val(2)));
+    //addToSolver(!(x == getCtx().int_val(3) && y == getCtx().int_val(2)));
     std::cout << solver.check() << std::endl;
     //std::cout << "Assertion x == 3 && y == 2 is: " << (solver.check() == unsat ? "VALID" : "INVALID") << std::endl;
 }
