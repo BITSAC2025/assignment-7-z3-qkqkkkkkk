@@ -296,19 +296,16 @@ void Z3Tests::test7()
     expr c = getZ3Expr("c");
     expr d = getZ3Expr("d");
     
-    addToSolver(a == getCtx().int_val(1));
-    addToSolver(b == getCtx().int_val(2));
-    addToSolver(c == getCtx().int_val(3));
-    
-    expr condition = (a > getCtx().int_val(0));
-    addToSolver(implies(condition, d == b + c));
-    addToSolver(implies(!condition, d == b - c));
-    
+    addToSolver(a == getZ3Expr(1));
+    addToSolver(b == getZ3Expr(2));
+    addToSolver(c == getZ3Expr(3));
+
+    expr cond = (a > getZ3Expr(0));
+    addToSolver(d == ite(cond, b + c, b - c));
+    // d = ite(cond, b + c, b - c);
+    addToSolver(d == 5);
     printExprValues();
-    
-    //addToSolver(d != getCtx().int_val(5));
     std::cout << solver.check() << std::endl;
-    //std::cout << "Assertion d == 5 is: " << (solver.check() == unsat ? "VALID" : "INVALID") << std::endl;
 }
 
 /*
@@ -331,21 +328,18 @@ void Z3Tests::test8()
     expr a = getZ3Expr("a");
     expr p = getZ3Expr("p");
     
-    // Initialize array: arr[0] = 0, arr[1] = 1
-    storeValue(arr, getCtx().int_val(0));           // arr[0] = 0
-    storeValue(arr + getCtx().int_val(1), getCtx().int_val(1));       // arr[1] = 1
-    
-    addToSolver(a == getCtx().int_val(10));
-    
-    expr condition = (a > getCtx().int_val(5));
-    addToSolver(implies(condition, p == arr));        // p = &arr[0]
-    addToSolver(implies(!condition, p == arr + getCtx().int_val(1)));   // p = &arr[1]
-    
+    addToSolver(arr == getMemObjAddress("arr"));
+
+    addToSolver(a == getZ3Expr(10));
+    storeValue(arr, getZ3Expr(0));
+    storeValue(arr + 1, getZ3Expr(1));
+
+    expr cond = (a > getZ3Expr(5));
+    addToSolver(p == ite(cond, arr, arr + 1));
+    // p = ite(cond, arr, arr + 1);
+    addToSolver(loadValue(p) == getZ3Expr(0));
     printExprValues();
-    
-    //addToSolver(loadValue(p) != getCtx().int_val(0));
     std::cout << solver.check() << std::endl;
-    //std::cout << "Assertion *p == 0 is: " << (solver.check() == unsat ? "VALID" : "INVALID") << std::endl;
 }
 
 /*
@@ -381,26 +375,27 @@ void Z3Tests::test9()
     expr y = getZ3Expr("y");
     expr z = getZ3Expr("z");
     
+    // 分配内存：p 指向 malloc1，x 指向 malloc2
     addToSolver(p == getMemObjAddress("malloc1"));
     addToSolver(x == getMemObjAddress("malloc2"));
-    storeValue(x, getCtx().int_val(5));           // *x = 5
-    
-    // q = &(p->f0) - assume f0 is at offset 0
-    addToSolver(q == p);
-    storeValue(q, getCtx().int_val(10));          // *q = 10 (i.e., p->f0 = 10)
-    
-    // r = &(p->f1) - assume f1 is at offset 1 (simplified)
-    addToSolver(r == p + getCtx().int_val(1));
-    storeValue(r, x);           // *r = x (i.e., p->f1 = x)
-    
-    addToSolver(y == loadValue(r));  // y = *r
-    addToSolver(z == loadValue(q) + loadValue(y));  // z = *q + *y
-    
+
+    // *x = 5
+    storeValue(x, ctx.int_val(5));
+    // q = &(p->f0)（f0 偏移 0）
+    addToSolver(q == getGepObjAddress(p, 0));
+    // *q = 10（p->f0 = 10）
+    storeValue(q, ctx.int_val(10));
+    // r = &(p->f1)（f1 偏移 1）
+    addToSolver(r == getGepObjAddress(p, 1));
+    // *r = x（p->f1 = x）
+    storeValue(r, x);
+    // y = *r（y = x）
+    addToSolver(y == loadValue(r));
+    // z = *q + *y（z = 10 + 5）
+    addToSolver(z == loadValue(q) + loadValue(y));
+
     printExprValues();
-    
-    //addToSolver(z != getCtx().int_val(15));
     std::cout << solver.check() << std::endl;
-    //std::cout << "Assertion z == 15 is: " << (solver.check() == unsat ? "VALID" : "INVALID") << std::endl;
 }
 
 /*
@@ -421,24 +416,35 @@ void Z3Tests::test10()
     // For function calls, we need to model the side effects
     // We'll use a global variable k to simulate the function's behavior
     
-    expr k = getZ3Expr("k");
-    expr x = getZ3Expr("x");
+    // expr k = getZ3Expr("k");
+    // expr x = getZ3Expr("x");
+    // expr y = getZ3Expr("y");
+    
+    // // First call: y = foo(2)
+    // addToSolver(k == getCtx().int_val(2));  // foo(2) sets k = 2
+    // addToSolver(y == k);  // and returns k
+    
+    // // Second call: x = foo(3)  
+    // addToSolver(k == getCtx().int_val(3));  // foo(3) sets k = 3
+    // addToSolver(x == k);  // and returns k
+    
+    // printExprValues();
+    
+    // // Check the assertion
+    // //addToSolver(!(x == getCtx().int_val(3) && y == getCtx().int_val(2)));
+    // std::cout << solver.check() << std::endl;
+    // //std::cout << "Assertion x == 3 && y == 2 is: " << (solver.check() == unsat ? "VALID" : "INVALID") << std::endl;
+	expr x = getZ3Expr("x");
     expr y = getZ3Expr("y");
-    
-    // First call: y = foo(2)
-    addToSolver(k == getCtx().int_val(2));  // foo(2) sets k = 2
-    addToSolver(y == k);  // and returns k
-    
-    // Second call: x = foo(3)  
-    addToSolver(k == getCtx().int_val(3));  // foo(3) sets k = 3
-    addToSolver(x == k);  // and returns k
-    
+
+    // y = foo(2); 返回 2
+    addToSolver(y == getZ3Expr(2));
+
+    // x = foo(3); 返回 3
+    addToSolver(x == getZ3Expr(3));
+
     printExprValues();
-    
-    // Check the assertion
-    //addToSolver(!(x == getCtx().int_val(3) && y == getCtx().int_val(2)));
     std::cout << solver.check() << std::endl;
-    //std::cout << "Assertion x == 3 && y == 2 is: " << (solver.check() == unsat ? "VALID" : "INVALID") << std::endl;
 }
 
 
